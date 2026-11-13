@@ -96,11 +96,11 @@ export function setupGlobals(env, userSettings = {}, ctx = null) {
     };
 
     // 注入环境变量
-    globalThis.__env__ = env;
+    globalThis.__env__ = {}; // Never expose Worker bindings or secrets to the engine.
 
     // Node.js process polyfill
     globalThis.process = {
-        env: env || {},
+        env: {},
         version: 'v20.0.0',
         argv: [],
         cwd: () => '/',
@@ -133,7 +133,7 @@ async function sendBarkNotification(config, title, subtitle, content) {
 
     const url = `${baseUrl}/${encodeURIComponent(deviceKey)}/${encodeURIComponent(fullTitle)}/${encodeURIComponent(content)}?${params.toString()}`;
 
-    const res = await fetch(url);
+    const res = await fetch(url, {signal: AbortSignal.timeout(10000)});
     if (!res.ok) {
         throw new Error(`Bark 推送失败: ${res.status}`);
     }
@@ -151,6 +151,7 @@ async function sendPushoverNotification(config, title, subtitle, content) {
 
     const res = await fetch('https://api.pushover.net/1/messages.json', {
         method: 'POST',
+        signal: AbortSignal.timeout(10000),
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             token: appToken,

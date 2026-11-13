@@ -60,8 +60,6 @@ export function createHttpClient() {
             controllers?.add(controller);
             const task = fetch(options.url, fetchOptions)
                 .then(async (response) => {
-                    clearTimeout(timeoutId);
-
                     let body;
 
                     if (options.encoding === null) {

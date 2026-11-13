@@ -39,8 +39,9 @@ async function execute({user, env, ctx, $request, timeout = 45000}) {
     try {
         await initSubStore($request);
         const result = await done;
-        clearTimeout(timer);
+        for (const controller of controllers) controller.abort();
         while (tasks.size) await Promise.allSettled([...tasks]);
+        clearTimeout(timer);
         const data = JSON.stringify(store.getData());
         if (data !== (current.data || '{}')) {
             const update = await env.DB.prepare('UPDATE users SET data = ?, updated_at = ? WHERE id = ? AND data = ?')

@@ -1,13 +1,14 @@
 import { build } from 'esbuild';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { builtinModules } from 'node:module';
 import { subStoreTransformPlugin } from '../vite.config.js';
 
 const transform = subStoreTransformPlugin().transform;
 const root = path.resolve('sub-store/backend');
 const result = await build({
   entryPoints: [path.join(root, 'src/main.js')], bundle: true, write: false,
-  platform: 'browser', format: 'iife', target: 'es2022', minifySyntax: true, external: ['node:*'],
+  platform: 'browser', format: 'iife', target: 'es2022', minifySyntax: true, external: ['node:*', ...builtinModules],
   alias: { '@': path.join(root, 'src') },
   plugins: [{name: 'worker-source-transform', setup(b) {
     b.onLoad({filter: /\.js$/}, async ({path: id}) => {
