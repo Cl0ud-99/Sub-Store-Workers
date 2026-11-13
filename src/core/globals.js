@@ -88,6 +88,8 @@ export function setupGlobals(env, userSettings = {}, ctx = null) {
         },
     };
 
+    globalThis.$argument = 'cors=https://sub-store-ui.cl0ud99.workers.dev,https://sub.yeshaojie.top,https://sub-store.cl0ud99.workers.dev';
+
     // 模拟 Surge 环境变量（使用用户自定义值）
     globalThis.$environment = {
         'surge-version': userSettings.surgeVersion || '5.0.0',
