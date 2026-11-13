@@ -22,5 +22,11 @@ const result = await build({
 await mkdir('src/generated', {recursive: true});
 await writeFile('src/generated/substore-engine.js',
   '// Generated at build time. All engine initialization runs INSIDE the request handler.\n' +
-  'export function runSubStoreEngine() {\n' + result.outputFiles[0].text + '\n}\n');
+  'import * as buffer from "node:buffer";\n' +
+  'import * as crypto from "node:crypto";\n' +
+  'import * as util from "node:util";\n' +
+  'import * as events from "node:events";\n' +
+  'export function runSubStoreEngine() {\n' +
+  'const require = id => { const modules = {buffer, crypto, util, events}; const key = id.replace(/^node:/, ""); if (key in modules) return modules[key]; throw new Error("Unsupported Node module: " + id); };\n' +
+  result.outputFiles[0].text + '\n}\n');
 console.log('Request-scoped engine bundled:', result.outputFiles[0].text.length, 'bytes');
