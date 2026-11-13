@@ -114,14 +114,14 @@ export async function handleDashboardRequest(request, env) {
                 return errorResponse('用户名或密码错误', 401);
             }
 
-            const token = await signToken({ id: user.id, username: user.username, role: user.role });
+            const token = await signToken({ id: user.id, username: user.username, role: user.role }, env);
             const frontendUrl = await getSetting(db, 'frontendUrl');
             return jsonResponse({ token, role: user.role, path: user.path, frontendUrl });
         }
 
         // ===== Protected Routes =====
 
-        const authPayload = await authenticateRequest(request);
+        const authPayload = await authenticateRequest(request, env);
         if (!authPayload) {
             return errorResponse('Unauthorized', 401);
         }

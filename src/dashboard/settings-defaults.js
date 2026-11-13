@@ -5,5 +5,5 @@
 
 export const defaultSettings = {
     // Sub-Store 前端 URL
-    frontendUrl: 'https://sub-store.vercel.app/',
+    frontendUrl: 'https://sub-store-ui.cl0ud99.workers.dev/',
 };

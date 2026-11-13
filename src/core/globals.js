@@ -81,11 +81,10 @@ export function setupGlobals(env, userSettings = {}, ctx = null) {
             };
 
             // 使用 ctx.waitUntil 确保请求完成，否则 fire-and-forget
-            if (ctx && typeof ctx.waitUntil === 'function') {
-                ctx.waitUntil(sendNotification());
-            } else {
-                sendNotification();
-            }
+            const tasks = globalThis.__substore_tasks__;
+            const task = sendNotification();
+            tasks?.add(task);
+            task.finally(() => tasks?.delete(task));
         },
     };
 

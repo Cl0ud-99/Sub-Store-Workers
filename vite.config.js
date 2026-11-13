@@ -20,7 +20,7 @@ const SUB_STORE_PATH = path.join(__dirname, 'sub-store/backend');
  * Sub-Store 代码替换插件
  * 替换 Node.js 特有代码为 Workers 兼容的 shim
  */
-function subStoreTransformPlugin() {
+export function subStoreTransformPlugin() {
     return {
         name: 'sub-store-transform',
         enforce: 'pre',
@@ -31,6 +31,9 @@ function subStoreTransformPlugin() {
             }
 
             let contents = code;
+            // Per-request bundles must never install isolate-global console hooks.
+            contents = contents.replace(/installConsoleLogCapture\(this\);/g, '');
+
 
             // ============ Node.js 模块替换 ============
 
@@ -141,7 +144,7 @@ function subStoreTransformPlugin() {
 
             // 硬编码 isSurge = true (因为模块加载时 $httpClient 可能还未设置)
             contents = contents.replace(
-                /const\s+isSurge\s*=\s*typeof\s+\$httpClient\s*!==\s*['"]undefined['"]\s*&&\s*!isLoon\s*;/g,
+                /const\s+isSurge\s*=\s*typeof\s+\$httpClient\s*!==\s*['"]undefined['"]\s*&&\s*!isLoon(?:\s*&&\s*!isEgern)?\s*;/g,
                 'const isSurge = true;'
             );
 

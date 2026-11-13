@@ -55,7 +55,10 @@ export function createHttpClient() {
             delete fetchOptions.insecure;
             delete fetchOptions.rejectUnauthorized;
 
-            fetch(options.url, fetchOptions)
+            const tasks = globalThis.__substore_tasks__;
+            const controllers = globalThis.__substore_controllers__;
+            controllers?.add(controller);
+            const task = fetch(options.url, fetchOptions)
                 .then(async (response) => {
                     clearTimeout(timeoutId);
 
@@ -86,7 +89,13 @@ export function createHttpClient() {
                     clearTimeout(timeoutId);
                     error(`[HTTP] 错误: ${method.toUpperCase()} ${options.url} - ${err.message}`);
                     callback(err.message || String(err), null, null);
+                })
+                .finally(() => {
+                    clearTimeout(timeoutId);
+                    tasks?.delete(task);
+                    controllers?.delete(controller);
                 });
+            tasks?.add(task);
         };
     });
 

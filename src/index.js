@@ -8,7 +8,6 @@ import './core/globals.js';
 
 import { handleDashboardRequest } from './dashboard/router.js';
 import { getUserByPath } from './dashboard/user.js';
-import { setupGlobals } from './core/globals.js';
 import { handleSubStoreHttpRequest, handleSubStoreCronRequest } from './core/substore.js';
 import { handleCORS } from './core/request.js';
 import { initLogger, info, error } from './utils/logger.js';
@@ -34,7 +33,6 @@ export default {
 
         // 1. Dashboard 路由 (优先)
         if (url.pathname.startsWith('/dashboard') || url.pathname.startsWith('/api/dashboard')) {
-            setupGlobals(env);
             return handleDashboardRequest(request, env);
         }
 

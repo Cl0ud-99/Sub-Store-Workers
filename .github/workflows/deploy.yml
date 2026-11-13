@@ -45,7 +45,7 @@ jobs:
         id: check
         run: |
           # 获取最新版本
-          BACKEND_VERSION=$(curl -s https://api.github.com/repos/${{ env.SUBSTORE_REPO }}/releases/latest | jq -r '.tag_name')
+          BACKEND_VERSION=2.44.11 # Pin verified backend; upgrade only after validation
           FRONTEND_VERSION=$(curl -s https://api.github.com/repos/${{ env.FRONTEND_REPO }}/releases/latest | jq -r '.tag_name')
           
           echo "backend_version=$BACKEND_VERSION" >> $GITHUB_OUTPUT

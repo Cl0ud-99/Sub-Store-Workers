@@ -78,10 +78,7 @@ export function buildResponse(result) {
 
     return new Response(response.body || '', {
         status: status,
-        headers: response.headers || {
-            'Content-Type': 'text/plain;charset=UTF-8',
-            ...CORS_HEADERS,
-        },
+        headers: { 'Content-Type': 'text/plain;charset=UTF-8', ...(response.headers || {}), ...CORS_HEADERS },
     });
 }
 
