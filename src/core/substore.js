@@ -74,7 +74,7 @@ export async function handleSubStoreHttpRequest({user, env, ctx, request, subSto
     // Read the body outside the lock; no shared engine state here.
     const $request = await parseRequest(request, subStorePath);
     return exclusive(async () => {
-        try { return buildResponse(await execute({user, env, ctx, $request})); }
+        try { return buildResponse(await execute({user, env, ctx, $request}), $request); }
         catch (err) {
             console.error('[SubStore] Request failed:', err.stack || err.message);
             return buildErrorResponse(err.message || 'Internal Server Error');

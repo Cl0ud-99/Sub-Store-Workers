@@ -4,6 +4,7 @@
  */
 
 import { debug } from '../utils/logger.js';
+import { prepareClashResponse } from './clash-profile.js';
 
 /**
  * CORS 响应头
@@ -57,14 +58,14 @@ export async function parseRequest(request, basePath) {
 /**
  * 构建 Sub-Store 响应
  */
-export function buildResponse(result) {
+export function buildResponse(result, request) {
     if (!result) {
         return new Response('No response', { status: 500 });
     }
 
     // Surge 模式：result = { response: { status, body, headers } }
     // QX 模式：result = { status, body, headers }
-    const response = result.response || result;
+    const response = prepareClashResponse(result.response || result, request);
 
     let status = 200;
     if (typeof response.status === 'number') {
