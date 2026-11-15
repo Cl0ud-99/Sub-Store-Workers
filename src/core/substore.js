@@ -5,13 +5,20 @@ import { initSubStore } from './substore-loader.js';
 
 // The upstream engine uses globals. Serialize it within an isolate and instantiate
 // all its caches per request. CAS persistence protects concurrent different isolates.
-let tail = Promise.resolve();
+// Do not share pending promises across Workers requests. A cancelled queue waiter
+// must not leave an unresolvable promise behind and poison the whole isolate.
+let activeLease = null;
 async function exclusive(task) {
-    const previous = tail;
-    let release;
-    tail = new Promise(resolve => { release = resolve; });
-    await previous;
-    try { return await task(); } finally { release(); }
+    const waitStarted = Date.now();
+    while (activeLease && Date.now() < activeLease.expiresAt) {
+        if (Date.now() - waitStarted > 50000) throw new Error('Server busy; retry shortly');
+        // The timer and its promise belong to THIS request, not the previous one.
+        await new Promise(resolve => setTimeout(resolve, 25));
+    }
+    const lease = { expiresAt: Date.now() + 70000 };
+    activeLease = lease;
+    try { return await task(); }
+    finally { if (activeLease === lease) activeLease = null; }
 }
 
 async function execute({user, env, ctx, $request, timeout = 45000}) {
